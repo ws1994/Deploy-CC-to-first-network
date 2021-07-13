@@ -1,0 +1,223 @@
+
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST1_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST2_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST3_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST4_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST5_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+scp -i sector-dev-shared-us-east1.pem -r sectorPro/ ubuntu@${HOST6_PUB_IP}:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/chaincode/
+
+
+
+
+### run in peer1.org1
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_ADDRESS=peer1.org1.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+peer lifecycle chaincode install sector.tar.gz
+
+
+
+
+### run in peer2.org1
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_ADDRESS=peer2.org1.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+peer lifecycle chaincode install sector.tar.gz
+
+
+
+
+### run in peer0.org1
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+peer lifecycle chaincode install sector.tar.gz
+
+export version=1
+export packageID=sector_1:abb2101c1cd3b71772af6e859a1e2bcc901c1a5b0a6804d876cde78ee9b48177
+
+peer lifecycle chaincode approveformyorg --orderer localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name sector -v $version --package-id $packageID --sequence $version --tls --cafile $ORDERER_CA
+
+
+
+
+
+
+### run in peer1.org2
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org2MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+export CORE_PEER_ADDRESS=peer1.org2.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+peer lifecycle chaincode install sector.tar.gz
+
+
+
+
+### run in peer2.org2
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org2MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer2.org2.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+export CORE_PEER_ADDRESS=peer2.org2.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+peer lifecycle chaincode install sector.tar.gz
+
+
+
+
+
+
+### run in peer0.org2
+
+export PATH=$PATH:/usr/local/go/bin/
+
+cd ./chaincode/sectorPro/go
+
+GO111MODULE=on go mod vendor
+
+cd ../../..
+
+
+export PATH=${PWD}/../bin:${PWD}:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+
+
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org2MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+export CORE_PEER_ADDRESS=peer0.org2.example.com:7051
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+peer lifecycle chaincode package sector.tar.gz --lang golang --path ./chaincode/sectorPro/go --label sector_1
+
+
+peer lifecycle chaincode install sector.tar.gz
+
+export version=1
+export packageID=sector_1:abb2101c1cd3b71772af6e859a1e2bcc901c1a5b0a6804d876cde78ee9b48177
+
+peer lifecycle chaincode approveformyorg --orderer orderer.example.com:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name sector -v $version --package-id $packageID --sequence $version --tls --cafile $ORDERER_CA
+
+
+
+
+export PEER0_ORG1_CA=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export PEER0_ORG2_CA=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+
+peer lifecycle chaincode commit -o orderer.example.com:7050 --ordererTLSHostnameOverride orderer.example.com --peerAddresses peer0.org1.example.com:7051 --tlsRootCertFiles ${PEER0_ORG1_CA} --peerAddresses peer0.org2.example.com:7051 --tlsRootCertFiles ${PEER0_ORG2_CA} --channelID mychannel --name sector -v $version  --sequence $version --tls --cafile $ORDERER_CA --waitForEvent
+
+
+
+
+
+### chaincode test
+
+# all nodes run 
+
+export PEER0_ORG1_CA=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export PEER0_ORG2_CA=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+
+
+### chaincode function test
+
+peer chaincode invoke -o orderer.example.com:7050 --tls true --cafile $ORDERER_CA -C mychannel -n sector --peerAddresses peer0.org1.example.com:7051 --tlsRootCertFiles ${PEER0_ORG1_CA} --peerAddresses peer0.org2.example.com:7051 --tlsRootCertFiles ${PEER0_ORG2_CA} -c '{"Args":["AddUserInfo","{\"name\":\"userSysAdmin\",\"objecttype\":\"user\",\"org\":\"UML\",\"systemrole\":\"sysAdmin\",\"projectrole\":[],\"project\":[]}"]}' --waitForEvent
+
+
+peer chaincode query -C mychannel -n sector -c '{"Args":["QueryUserInfo","userSysAdmin"]}'

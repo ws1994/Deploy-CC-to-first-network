@@ -1,0 +1,112 @@
+./network.sh down
+./network.sh clean
+docker ps -a
+
+cd sixEC2DemoWS/
+
+
+apt install dos2unix
+
+find . -type f -print0 | xargs -0 dos2unix
+
+dos2unix network.sh
+dos2unix ./dns_6host.sh
+dos2unix ./scripts/createChannel_step1.sh
+dos2unix ./scripts/createChannel_step2.sh
+dos2unix ./scripts/deployCC_step1.sh
+dos2unix ./scripts/deployCC_step2.sh
+dos2unix ./scripts/envVar.sh
+
+
+
+
+### only org1
+
+./network.sh pre
+
+
+scp -i ../../sector-dev-shared-us-east1.pem -r organizations/ ubuntu@34.207.90.254:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r organizations/ ubuntu@3.83.174.5:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r organizations/ ubuntu@34.238.126.135:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r organizations/ ubuntu@3.87.60.177:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r organizations/ ubuntu@54.86.220.113:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+
+
+scp -i ../../sector-dev-shared-us-east1.pem -r system-genesis-block/ ubuntu@34.207.90.254:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r system-genesis-block/ ubuntu@3.83.174.5:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r system-genesis-block/ ubuntu@34.238.126.135:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r system-genesis-block/ ubuntu@3.87.60.177:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r system-genesis-block/ ubuntu@54.86.220.113:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+
+
+
+
+### all org
+
+sudo ./dns_6host.sh
+
+./network.sh up -s couchdb
+
+
+docker exec -it peer0.org1.example.com ping peer0.org2.example.com
+
+
+
+
+### only org1
+
+./network.sh createChannel_step1
+
+
+scp -i ../../sector-dev-shared-us-east1.pem -r channel-artifacts/ ubuntu@34.207.90.254:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r channel-artifacts/ ubuntu@3.83.174.5:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r channel-artifacts/ ubuntu@34.238.126.135:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r channel-artifacts/ ubuntu@3.87.60.177:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r channel-artifacts/ ubuntu@54.86.220.113:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+
+
+
+### all org execpt org1
+
+./network.sh createChannel_step1
+
+
+
+### peer0.org1 and peer0.org2
+
+./network.sh createChannel_step2
+
+
+
+### only org1
+
+export PATH=$PATH:/usr/local/go/bin/
+
+./network.sh deployCC_step1
+
+
+
+
+scp -i ../../sector-dev-shared-us-east1.pem -r basic.tar.gz ubuntu@34.207.90.254:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r basic.tar.gz ubuntu@3.83.174.5:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r basic.tar.gz ubuntu@34.238.126.135:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r basic.tar.gz ubuntu@3.87.60.177:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+scp -i ../../sector-dev-shared-us-east1.pem -r basic.tar.gz ubuntu@54.86.220.113:/home/ubuntu/fabric/fabric-samples/sixEC2DemoWS/
+
+
+
+
+### all org execpt org1
+
+export PATH=$PATH:/usr/local/go/bin/
+
+./network.sh deployCC_step1
+
+
+
+### only org1
+
+./network.sh deployCC_step2
+
+
+docker ps
